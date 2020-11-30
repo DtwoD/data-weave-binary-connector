@@ -1,0 +1,40 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dwb="http://www.mulesoft.org/schema/mule/dwb"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/dwb http://www.mulesoft.org/schema/mule/dwb/current/mule-dwb.xsd">
+
+
+    <flow name="extractTest">
+        <dwb:extract>
+            <dwb:data>#[output application/dwb --- { message: vars.someMessage}]</dwb:data>
+        </dwb:extract>
+    </flow>
+
+    <flow name="readTest">
+        <dwb:read>
+            <dwb:data>#[output dwb --- { message: 'DW: a *fun* language'}]</dwb:data>
+        </dwb:read>
+    </flow>
+
+    <flow name="writeTest">
+        <dwb:write message="#[vars.someMessage]"/>
+        <set-payload value="#[output java --- payload.message as String]"/>
+    </flow>
+
+    <flow name="writeCustomTest">
+        <dwb:write-custom message="#['*--This is the actual message--*']"/>
+        <set-payload value="#[output java --- payload.sanitized as String]"/>
+    </flow>
+
+    <flow name="writeAndReadCustomTest">
+        <dwb:write-custom message="#['*--This is the actual message--*']"/>
+        <dwb:read-custom key="raw"/>
+    </flow>
+
+    <flow name="writeAndReadTest">
+        <dwb:write message="#['DW: a *fun* language']"/>
+        <dwb:read/>
+    </flow>
+
+</mule>
