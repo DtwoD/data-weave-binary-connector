@@ -22,20 +22,25 @@ public class DwbOperationTest {
         WeaveStreamWriter wsw = dwbService.getFactory().createStreamWriter(bot);
         wsw.writeStartDocument()
                 .writeStartObject()
-                .writeKey("message")
-                .writeString("B2B Rul3z")
-                .writeEndObject();
+                    .writeKey("object_1")
+                    .writeStartObject()
+                    .writeKey("message")
+                    .writeString("B2B Rul3z")
+                    .writeEndObject();
 
         WeaveStreamWriter wsw2 = dwbService.getFactory().createStreamWriter(bot2);
         wsw2.writeStartDocument()
                 .writeStartObject()
-                .writeKey("message2")
+                .writeKey("message")
                 .writeString("Mul3 Rul3z")
                 .writeEndObject()
                 .writeEndDocument();
 
-        wsw.mergeStream(wsw2.getResult());
-        wsw.writeString("TEST STRING");
+        wsw.writeKey("object_2")
+            .mergeStream(wsw2.getResult())
+            .writeKey("object_3")
+            .writeString("TEST STRING")
+            .writeEndObject();
 
         wsw.writeEndDocument();
 
@@ -44,5 +49,7 @@ public class DwbOperationTest {
         PrinterVisitor visitor = new PrinterVisitor();
         read_data.accept(visitor);
         System.out.println(visitor.toString());
+        String msg = wdr.read().evaluateAsObject().get("object_2").evaluateAsObject().get("message").toString();
+        System.out.println(msg);
     }
 }
