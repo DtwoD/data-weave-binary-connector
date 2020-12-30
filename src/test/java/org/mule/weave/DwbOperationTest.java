@@ -20,36 +20,50 @@ public class DwbOperationTest {
         ByteArrayOutputStream bot2 = new ByteArrayOutputStream();
 
         WeaveStreamWriter wsw = dwbService.getFactory().createStreamWriter(bot);
-        wsw.writeStartDocument()
-                .writeStartObject()
-                    .writeKey("object_1")
-                    .writeStartObject()
-                    .writeKey("message")
-                    .writeString("B2B Rul3z")
-                    .writeEndObject();
+
+
 
         WeaveStreamWriter wsw2 = dwbService.getFactory().createStreamWriter(bot2);
         wsw2.writeStartDocument()
-                .writeStartObject()
+            .writeStartObject()
                 .writeKey("message")
                 .writeString("Mul3 Rul3z")
-                .writeEndObject()
-                .writeEndDocument();
+            .writeEndObject()
+        .writeEndDocument();
 
+        /*
         wsw.writeKey("object_2")
             .mergeStream(wsw2.getResult())
             .writeKey("object_3")
             .writeString("TEST STRING")
-            .writeEndObject();
+            .writeEndObject();*/
 
-        wsw.writeEndDocument();
+        wsw.writeStartDocument()
+            .writeStartObject()
+                .beginTransaction()
+                    .writeKey("MyObject")
+                    .commit()
+                    .writeStartObject()
+                        .writeKey("MyKEY")
+                        .writeString("MyVALUE")
+                    .writeEndObject()
+                    .writeKey("MyArray")
+                    .commit()
+                    .writeStartArray()
+                        .writeInt(1)
+                    .writeEndArray()
+                    .writeKey("MyMerge")
+                    .commit()
+                    .mergeStream(wsw2.getResult())
+                .endTransaction()
+            .writeEndObject()
+        .writeEndDocument();
 
         WeaveDOMReader wdr = dwbService.getFactory().createDOMReader(wsw.getResult());
         IWeaveValue read_data = wdr.read();
         PrinterVisitor visitor = new PrinterVisitor();
         read_data.accept(visitor);
         System.out.println(visitor.toString());
-        String msg = wdr.read().evaluateAsObject().get("object_2").evaluateAsObject().get("message").toString();
-        System.out.println(msg);
+
     }
 }
